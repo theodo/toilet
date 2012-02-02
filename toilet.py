@@ -7,14 +7,14 @@ class Toilet:
   def __init__(self, name, status):
     self.name   = name
     self.status = self.FREE if status > 80 else self.USED
-    self.timer = Timer(4444.0, self.change_value())
+    self.timer = Timer(4.0, self.change_value())
     self.timer.start()
 
   def to_string(self):
     return '%s is %s' % (self.name, self.status)
 
   def change_value(self):
-    self.status = self.FREE if self.status > self.USED else self.USED
+    self.status = self.FREE if self.status is self.USED else self.USED
     print self.status
 
   def is_free(self):

@@ -10,8 +10,7 @@ class ToiletIndicator:
   def __init__(self):
     datas = urllib2.urlopen('http://lights.theodo.fr')
     self.toilets = []
-    for name, status in json.load(datas).iteritems():
-      self.toilets.append(Toilet(name, status))
+    [self.toilets[Toilet(name, status) for name, status in json.load(datas).iteritems()]
     
     self.ind = appindicator.Indicator("toilet", "indicator-messages", appindicator.CATEGORY_APPLICATION_STATUS)
     self.ind.set_status(appindicator.STATUS_ACTIVE)
@@ -25,11 +24,9 @@ class ToiletIndicator:
       buf = toilet.to_string()
       
       menu_items = gtk.MenuItem(buf)
-
       menu.append(menu_items)
 
       # this is where you would connect your menu item up with a function:
-                                          
       # menu_items.connect("activate", menuitem_response, buf)
 
       # show the items
