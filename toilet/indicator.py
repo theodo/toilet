@@ -1,6 +1,5 @@
-from toilet import Toilet
+from toilet.toilet import Toilet
 from threading import Timer
-import gobject
 import gtk
 import appindicator
 import json
