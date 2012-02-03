@@ -48,7 +48,7 @@ class ToiletIndicator:
         self.wemen_toilet = Toilet('Wemen', 'captor1')
         self.wemen_toilet.menu_item = gtk.MenuItem(self.wemen_toilet.to_string())
 
-        self.men_toilet   = Toilet('Mens', 'captor2')
+        self.men_toilet   = Toilet('Men', 'captor2')
         self.men_toilet.menu_item = gtk.MenuItem(self.men_toilet.to_string())
 
         self.update_toilets()
