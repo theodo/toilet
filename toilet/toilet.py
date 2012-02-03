@@ -1,26 +1,40 @@
 # -*- coding: utf-8 -*-
-__author__='Benjamin Grandfond <benjaming@theodo.fr>'
+__author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
-from threading import Timer
+import gtk
 
 class Toilet:
 
     FREE = 'free'
     USED = 'used'
 
-    def __init__(self, name, status):
-        self.name   = name
+    menu_item = None
 
-        # Convert a bool or an int into free or false
-        if status not in [self.FREE, self.USED]:
-            convert_status(status)
-        self.status = status
+    def __init__(self, name, captor, status=True):
+        self.name      = name
+        self._captor   = captor
+        self.update(status)
 
     def to_string(self):
-        return '%s is %s' % (self.name, self.status)
+        return '%s is %s' % (self.name, self._status)
 
     def is_free(self):
-        return True if self.status == self.FREE else False
+        """
+        Check if the toilet is free or used.
+        """
+        return True if self._status == self.FREE else False
+
+    def captor(self):
+        """
+        Return the captor name.
+        """
+        return self._captor
+
+    def update(self, status):
+        self._status = self.convert_status(status)
+        if isinstance(self.menu_item, gtk.MenuItem):
+            self.menu_item.set_label(self.to_string())
+            self.menu_item.show()
 
     @classmethod
     def convert_status(cls, status):
@@ -28,11 +42,14 @@ class Toilet:
         Convert a boolean or a int into a Toilet status (free or used).
         A toilet is free if the status var is True or an int > 80.
         A toilet is used if the status var is False or an int <= 80.
-
         """
-        if isinstance(status, bool):
-            return Toilet.FREE if status == True else Toilet.USED
-        elif isinstance(status, int):
-            return Toilet.FREE if status > 80 else Toilet.USED
+        # Convert a bool or an int into free or false
+        if status in [cls.FREE, cls.USED]:
+            return status
         else:
-            raise ValueError('status must be a boolean or an int, %s given' % type(status))
+            if isinstance(status, bool):
+                return Toilet.FREE if status == True else Toilet.USED
+            elif isinstance(status, int):
+                return Toilet.FREE if status > 80 else Toilet.USED
+            else:
+                raise ValueError('status must be a boolean or an int, %s given' % type(status))

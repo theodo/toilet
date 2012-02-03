@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-__author__='Benjamin Grandfond <benjaming@theodo.fr>'
+__author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 import unittest
 from toilet.toilet import Toilet
 
 class TestToilet(unittest.TestCase):
     def setUp(self):
-        self.toilet = Toilet('toilet', Toilet.FREE)
+        self.toilet = Toilet('toilet', 'captor', Toilet.FREE)
+
+    def test_captor(self):
+        self.assertEqual('captor', self.toilet.captor())
 
     def test_convert_status(self):
         self.assertEqual(Toilet.FREE, Toilet.convert_status(True))
@@ -21,19 +24,20 @@ class TestToilet(unittest.TestCase):
         except ValueError as err:
             self.assertIsInstance(err, ValueError)
 
-
-
     def test_is_free(self):
         self.assertTrue(self.toilet.is_free())
 
     def test_is_not_free(self):
-        self.toilet.status = False
+        self.toilet.update(False)
         self.assertFalse(self.toilet.is_free())
 
     def test_to_string(self):
         self.assertEqual('toilet is free', self.toilet.to_string())
 
-        self.toilet.status = Toilet.USED
+        self.toilet.update(Toilet.USED)
+        self.assertEqual('toilet is used', self.toilet.to_string())
+
+        self.toilet.update(False)
         self.assertEqual('toilet is used', self.toilet.to_string())
 
 if __name__ == '__main__':
