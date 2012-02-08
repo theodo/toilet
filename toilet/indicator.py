@@ -11,29 +11,42 @@ import urllib2
 
 class ToiletIndicator:
     def __init__(self):
+        self.women_toilet = Toilet('Women', 'captor1')
+        self.men_toilet   = Toilet('Men', 'captor2')
+
         self.ind = appindicator.Indicator("toilet",
-                                          self.icon_free(),
-                                          appindicator.CATEGORY_APPLICATION_STATUS)
+            self.icon_free(),
+            appindicator.CATEGORY_APPLICATION_STATUS
+        )
         self.ind.set_status(appindicator.STATUS_ACTIVE)
         self.ind.set_attention_icon(self.icon_used())
+        self.create_menu()
 
-        self.initialize_toilets()
-        self.ind.set_menu(self.create_menu())
-
-        #self.poll()
+        self.update_toilets()
 
     def create_menu(self):
         """
         Create a gtk Menu with toilet menu items.
         """
-        menu = gtk.Menu()
-        menu.append(self.women_toilet.menu_item)
-        self.women_toilet.menu_item.show()
+        self.menu = gtk.Menu()
 
-        menu.append(self.men_toilet.menu_item)
-        self.men_toilet.menu_item.show()
+        self.women_menu_item = gtk.MenuItem(self.women_toilet.to_string())
+        self.menu.append(self.women_menu_item)
+        self.women_menu_item.show()
 
-        return menu
+        self.men_menu_item = gtk.MenuItem(self.men_toilet.to_string())
+        self.menu.append(self.men_menu_item)
+        self.men_menu_item.show()
+
+        self.ind.set_menu(self.menu)
+
+    def update_labels(self):
+        """
+        Updates the labels of the menu items.
+        """
+        self.women_menu_item.get_child().set_label(self.women_toilet.to_string())
+        self.men_menu_item.get_child().set_label(self.men_toilet.to_string())
+
 
     def icon_directory(self):
         return os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "./images" + os.path.sep
@@ -44,19 +57,9 @@ class ToiletIndicator:
     def icon_used(self):
         return self.icon_directory() + "toilet-used.png"
 
-    def initialize_toilets(self):
-        self.women_toilet = Toilet('women', 'captor1')
-        self.women_toilet.menu_item = gtk.MenuItem(self.women_toilet.to_string())
-
-        self.men_toilet   = Toilet('Men', 'captor2')
-        self.men_toilet.menu_item = gtk.MenuItem(self.men_toilet.to_string())
-
-        self.update_toilets()
-
     def poll(self):
         print 'Toilets statuses will be updated in 1 seconds'
         Timer(3.0, self.update_toilets).start()
-        self.ind.set_menu(self.create_menu())
 
     def update_toilets(self):
         print 'Updating toilets statuses from http://lights.theodo.fr'
@@ -75,9 +78,8 @@ class ToiletIndicator:
                 self.ind.set_status(appindicator.STATUS_ACTIVE)
             print toilet.to_string()
 
-        #self.poll()
-        Timer(3.0, self.update_toilets).start()
-
+        self.update_labels()
+        self.poll()
 
 if __name__ == "__main__":
     indicator = ToiletIndicator()
