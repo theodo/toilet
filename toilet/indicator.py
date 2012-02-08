@@ -27,8 +27,8 @@ class ToiletIndicator:
         Create a gtk Menu with toilet menu items.
         """
         menu = gtk.Menu()
-        menu.append(self.wemen_toilet.menu_item)
-        self.wemen_toilet.menu_item.show()
+        menu.append(self.women_toilet.menu_item)
+        self.women_toilet.menu_item.show()
 
         menu.append(self.men_toilet.menu_item)
         self.men_toilet.menu_item.show()
@@ -45,8 +45,8 @@ class ToiletIndicator:
         return self.icon_directory() + "toilet-used.png"
 
     def initialize_toilets(self):
-        self.wemen_toilet = Toilet('Wemen', 'captor1')
-        self.wemen_toilet.menu_item = gtk.MenuItem(self.wemen_toilet.to_string())
+        self.women_toilet = Toilet('women', 'captor1')
+        self.women_toilet.menu_item = gtk.MenuItem(self.women_toilet.to_string())
 
         self.men_toilet   = Toilet('Men', 'captor2')
         self.men_toilet.menu_item = gtk.MenuItem(self.men_toilet.to_string())
@@ -56,18 +56,19 @@ class ToiletIndicator:
     def poll(self):
         print 'Toilets statuses will be updated in 1 seconds'
         Timer(3.0, self.update_toilets).start()
+        self.ind.set_menu(self.create_menu())
 
     def update_toilets(self):
         print 'Updating toilets statuses from http://lights.theodo.fr'
         #datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
 
-        #self.wemen_toilet.update(datas[self.wemen_toilet.captor()])
+        #self.women_toilet.update(datas[self.women_toilet.captor()])
         #self.men_toilet.update(datas[self.men_toilet.captor()])
 
-        self.wemen_toilet.update(False if self.wemen_toilet.is_free() else True)
+        self.women_toilet.update(False if self.women_toilet.is_free() else True)
         self.men_toilet.update(False if self.men_toilet.is_free() else True)
 
-        for toilet in [self.wemen_toilet, self.men_toilet]:
+        for toilet in [self.women_toilet, self.men_toilet]:
             if toilet.is_free() is False:
                 self.ind.set_status(appindicator.STATUS_ATTENTION)
             else:
