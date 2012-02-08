@@ -8,7 +8,6 @@ class Toilet:
     FREE = 'free'
     USED = 'used'
 
-    menu_item = None
 
     def __init__(self, name, captor, status=True):
         self.name      = name
@@ -32,9 +31,6 @@ class Toilet:
 
     def update(self, status):
         self._status = self.convert_status(status)
-        if isinstance(self.menu_item, gtk.MenuItem):
-            self.menu_item.set_label(self.to_string())
-            self.menu_item.show()
 
     @classmethod
     def convert_status(cls, status):
