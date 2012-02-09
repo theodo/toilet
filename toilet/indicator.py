@@ -122,7 +122,7 @@ class ToiletIndicator:
 
 if __name__ == "__main__":
     toilets = {
-        'women': Toilet('Women', 'captor1', False),
+        'women': Toilet('Women', 'captor2', False),
         'men':   Toilet('Men', 'captor1', True)
     }
     indicator = ToiletIndicator(toilets)
