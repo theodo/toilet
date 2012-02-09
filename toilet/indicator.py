@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
+import gobject
+
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
-from threading import Timer
 import os
 import gtk
 import appindicator
@@ -10,19 +11,28 @@ import json
 import urllib2
 
 class ToiletIndicator:
-    def __init__(self):
-        self.women_toilet = Toilet('Women', 'captor1')
-        self.men_toilet   = Toilet('Men', 'captor2')
+    def __init__(self, toilets, tempo=3000):
+        self.women_toilet = toilets['women']
+        self.men_toilet   = toilets['men']
+        self.tempo = tempo
 
         self.ind = appindicator.Indicator("toilet",
             self.icon_free(),
             appindicator.CATEGORY_APPLICATION_STATUS
         )
         self.ind.set_status(appindicator.STATUS_ACTIVE)
-        self.ind.set_attention_icon(self.icon_used())
+        self.ind.set_attention_icon(self.update_icon())
         self.create_menu()
 
-        self.update_toilets()
+        self._poll()
+
+    def _poll(self):
+        """
+        Starts polling.
+        """
+        # Use 0 for tempo in tests
+        if self.tempo > 0:
+            gobject.timeout_add(self.tempo, self.update_toilets)
 
     def create_menu(self):
         """
@@ -47,22 +57,55 @@ class ToiletIndicator:
         self.women_menu_item.get_child().set_label(self.women_toilet.to_string())
         self.men_menu_item.get_child().set_label(self.men_toilet.to_string())
 
+    def update_icon(self):
+        """
+        Update icon with toilets status.
+        """
+        if self.women_toilet.is_free() is True:
+            if self.men_toilet.is_free() is True:
+                return self.icon_free()
+            else:
+                return self.icon_men()
+        else:
+            if self.men_toilet.is_free() is True:
+                return self.icon_women()
+            else:
+                return self.icon_used()
 
     def icon_directory(self):
+        """
+        Returns the icons directory.
+        """
         return os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "./images" + os.path.sep
 
     def icon_free(self):
-        return self.icon_directory() + "toilet-free.png"
+        """
+        Returns the toilets free icon image.
+        """
+        return self.icon_directory() + "toilets.png"
 
     def icon_used(self):
-        return self.icon_directory() + "toilet-used.png"
+        """
+        Returns the toilets used icon image.
+        """
+        return self.icon_directory() + "toilets_used.png"
 
-    def poll(self):
-        print 'Toilets statuses will be updated in 1 seconds'
-        Timer(3.0, self.update_toilets).start()
+    def icon_men(self):
+        """
+        Returns the men toilets used icon image.
+        """
+        return self.icon_directory() + "toilets_king.png"
+
+    def icon_women(self):
+        """
+        Returns the women toilets used icon image.
+        """
+        return self.icon_directory() + "toilets_queen.png"
 
     def update_toilets(self):
-        print 'Updating toilets statuses from http://lights.theodo.fr'
+        """
+        Update toilets' status.
+        """
         #datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
 
         #self.women_toilet.update(datas[self.women_toilet.captor()])
@@ -71,16 +114,16 @@ class ToiletIndicator:
         self.women_toilet.update(False if self.women_toilet.is_free() else True)
         self.men_toilet.update(False if self.men_toilet.is_free() else True)
 
-        for toilet in [self.women_toilet, self.men_toilet]:
-            if toilet.is_free() is False:
-                self.ind.set_status(appindicator.STATUS_ATTENTION)
-            else:
-                self.ind.set_status(appindicator.STATUS_ACTIVE)
-            print toilet.to_string()
+        self.ind.set_icon(self.update_icon())
 
         self.update_labels()
-        self.poll()
+        self._poll()
+
 
 if __name__ == "__main__":
-    indicator = ToiletIndicator()
+    toilets = {
+        'women': Toilet('Women', 'captor1', False),
+        'men':   Toilet('Men', 'captor1', True)
+    }
+    indicator = ToiletIndicator(toilets)
     gtk.main()

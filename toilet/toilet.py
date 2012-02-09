@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
-import gtk
-
 class Toilet:
 
     FREE = 'free'
     USED = 'used'
-
 
     def __init__(self, name, captor, status=True):
         self.name      = name
