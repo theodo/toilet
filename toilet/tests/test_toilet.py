@@ -4,7 +4,7 @@ __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 import unittest
 from toilet.toilet import Toilet
 
-class TestToilet(unittest.TestCase):
+class ToiletTestCase(unittest.TestCase):
     def setUp(self):
         self.toilet = Toilet('toilet', 'captor', Toilet.FREE)
 

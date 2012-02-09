@@ -5,13 +5,16 @@ import unittest
 from mock import Mock
 from toilet.toilet import Toilet
 from toilet.indicator import ToiletIndicator
+from toilet.dataloader import FakeDataloader
 
-class TestIndicator(unittest.TestCase):
+class IndicatorTestCase(unittest.TestCase):
     def setUp(self):
         self.toilets = {
             'women': Toilet('Women', 'captor1', False), # used
             'men':   Toilet('Men', 'captor2', True)     # free
         }
+
+        self.dataloader = FakeDataloader()
 
         self.indicator = ToiletIndicator(self.toilets, 0)
 
@@ -41,6 +44,29 @@ class TestIndicator(unittest.TestCase):
         self.assertTrue(self.toilets['women'].is_free())
         self.assertTrue(self.toilets['men'].is_free())
         self.assertEqual(self.indicator.update_icon(), 'toilets.png')
+
+    def test_update_toilets(self):
+        self.indicator._poll = Mock()
+
+        self.indicator.update_toilets()
+        self.assertTrue(self.toilets['women'].is_free())
+        self.assertTrue(self.toilets['men'].is_free())
+        self.assertEqual(self.indicator.ind.get_icon(), 'toilets_queen.png')
+
+        self.indicator.update_toilets()
+        self.assertFalse(self.toilets['women'].is_free())
+        self.assertTrue(self.toilets['men'].is_free())
+        self.assertEqual(self.indicator.ind.get_icon(), 'toilets_king.png')
+
+        self.indicator.update_toilets()
+        self.assertFalse(self.toilets['women'].is_free())
+        self.assertFalse(self.toilets['men'].is_free())
+        self.assertEqual(self.indicator.ind.get_icon(), 'toilets_used.png')
+
+        self.indicator.update_toilets()
+        self.assertTrue(self.toilets['women'].is_free())
+        self.assertFalse(self.toilets['men'].is_free())
+        self.assertEqual(self.indicator.ind.get_icon(), 'toilets.png')
 
 if __name__ == '__main__':
     unittest.main()

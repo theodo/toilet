@@ -6,13 +6,12 @@ import os
 import gtk
 import gobject
 import appindicator
-import json
-import urllib2
 
 class ToiletIndicator:
-    def __init__(self, toilets, tempo=3000):
+    def __init__(self, toilets, loader, tempo=3000):
         self.women_toilet = toilets['women']
         self.men_toilet   = toilets['men']
+        self.loader =loader
         self.tempo = tempo
 
         self.ind = appindicator.Indicator("toilet",
@@ -105,25 +104,20 @@ class ToiletIndicator:
         """
         Update toilets' status.
         """
-        datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
+        datas = self.loader.load()
 
         self.women_toilet.update(datas[self.women_toilet.captor()])
         self.men_toilet.update(datas[self.men_toilet.captor()])
-
-        # Used for tests only
-        #self.women_toilet.update(False if self.women_toilet.is_free() else True)
-        #self.men_toilet.update(False if self.men_toilet.is_free() else True)
 
         self.ind.set_icon(self.update_icon())
 
         self.update_labels()
         self._poll()
 
-
 if __name__ == "__main__":
-    toilets = ({
+    toilets = {
         'women': Toilet('Women', 'captor2', False),
         'men':   Toilet('Men', 'captor1', True)
-    })
-    indicator = ToiletIndicator(toilets)
+    }
+    indicator = ToiletIndicator(toilets, Dataloader)
     gtk.main()
