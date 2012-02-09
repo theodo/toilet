@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-import gobject
-
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
 import os
 import gtk
+import gobject
 import appindicator
 import json
 import urllib2
