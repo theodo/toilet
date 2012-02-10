@@ -31,7 +31,13 @@ class ToiletIndicator:
         """
         # Use 0 for tempo in tests
         if self.tempo > 0:
-            gobject.timeout_add(self.tempo, self.update_toilets)
+            self._do_poll()
+
+    def _do_poll(self):
+        """
+        Really poll.
+        """
+        gobject.timeout_add(self.tempo, self.update_toilets)
 
     def create_menu(self):
         """
@@ -107,8 +113,12 @@ class ToiletIndicator:
         """
         datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
 
-        self.women_toilet.update(datas[self.women_toilet.captor()])
-        self.men_toilet.update(datas[self.men_toilet.captor()])
+        try:
+            self.women_toilet.update(datas[self.women_toilet.captor()])
+            self.men_toilet.update(datas[self.men_toilet.captor()])
+        except:
+            print 'There was an error : %s' % datas
+            self._do_poll()
 
         # Used for tests only
         #self.women_toilet.update(False if self.women_toilet.is_free() else True)
@@ -121,9 +131,9 @@ class ToiletIndicator:
 
 
 if __name__ == "__main__":
-    toilets = ({
+    toilets = {
         'women': Toilet('Women', 'captor2', False),
         'men':   Toilet('Men', 'captor1', True)
-    })
+    }
     indicator = ToiletIndicator(toilets)
     gtk.main()
