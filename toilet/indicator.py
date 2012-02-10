@@ -45,11 +45,11 @@ class ToiletIndicator:
         """
         self.menu = gtk.Menu()
 
-        self.women_menu_item = gtk.MenuItem(self.women_toilet.to_string())
+        self.women_menu_item = gtk.MenuItem(str(self.women_toilet))
         self.menu.append(self.women_menu_item)
         self.women_menu_item.show()
 
-        self.men_menu_item = gtk.MenuItem(self.men_toilet.to_string())
+        self.men_menu_item = gtk.MenuItem(str(self.men_toilet))
         self.menu.append(self.men_menu_item)
         self.men_menu_item.show()
 
@@ -59,8 +59,8 @@ class ToiletIndicator:
         """
         Updates the labels of the menu items.
         """
-        self.women_menu_item.get_child().set_label(self.women_toilet.to_string())
-        self.men_menu_item.get_child().set_label(self.men_toilet.to_string())
+        self.women_menu_item.get_child().set_label(str(self.women_toilet))
+        self.men_menu_item.get_child().set_label(str(self.men_toilet))
 
     def update_icon(self):
         """

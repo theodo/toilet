@@ -7,11 +7,11 @@ class Toilet:
     USED = 'used'
 
     def __init__(self, name, captor, status=True):
-        self.name      = name
-        self._captor   = captor
-        self.update(status)
+        self.name    = name
+        self._captor = captor
+        self._status = self.convert_status(status)
 
-    def to_string(self):
+    def __str__(self):
         return '%s is %s' % (self.name, self._status)
 
     def is_free(self):
@@ -27,7 +27,9 @@ class Toilet:
         return self._captor
 
     def update(self, status):
-        self._status = self.convert_status(status)
+        status = self.convert_status(status)
+        if status is not self._status:
+            self._status = status
 
     @classmethod
     def convert_status(cls, status):
