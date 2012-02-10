@@ -31,13 +31,7 @@ class ToiletIndicator:
         """
         # Use 0 for tempo in tests
         if self.tempo > 0:
-            self._do_poll()
-
-    def _do_poll(self):
-        """
-        Really poll.
-        """
-        gobject.timeout_add(self.tempo, self.update_toilets)
+            gobject.timeout_add(self.tempo, self.update_toilets)
 
     def create_menu(self):
         """
@@ -118,7 +112,6 @@ class ToiletIndicator:
             self.men_toilet.update(datas[self.men_toilet.captor()])
         except:
             print 'There was an error : %s' % datas
-            self._do_poll()
 
         # Used for tests only
         #self.women_toilet.update(False if self.women_toilet.is_free() else True)
