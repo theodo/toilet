@@ -11,7 +11,7 @@ class Toilet:
         self._captor = captor
         self._status = self.convert_status(status)
 
-    def __str__(self):
+    def __unicode__(self):
         return '%s is %s' % (self.name, self._status)
 
     def is_free(self):
