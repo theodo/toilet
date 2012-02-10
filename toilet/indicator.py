@@ -105,22 +105,25 @@ class ToiletIndicator:
         """
         Update toilets' status.
         """
-        datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
-
         try:
+            datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
+
             self.women_toilet.update(datas[self.women_toilet.captor()])
             self.men_toilet.update(datas[self.men_toilet.captor()])
-        except:
+
+            # Used for tests only
+            #self.women_toilet.update(False if self.women_toilet.is_free() else True)
+            #self.men_toilet.update(False if self.men_toilet.is_free() else True)
+  
+            self.ind.set_icon(self.update_icon())
+
+            self.update_labels()
+
+        except TypeError as e:
             print 'There was an error : %s' % datas
-
-        # Used for tests only
-        #self.women_toilet.update(False if self.women_toilet.is_free() else True)
-        #self.men_toilet.update(False if self.men_toilet.is_free() else True)
-
-        self.ind.set_icon(self.update_icon())
-
-        self.update_labels()
-        self._poll()
+            print e
+        finally:
+            self._poll()
 
 
 if __name__ == "__main__":
