@@ -5,7 +5,7 @@ import unittest
 from mock import Mock
 from toilet.toilet import Toilet
 from toilet.indicator import ToiletIndicator
-from toilet.dataloader import FakeDataloader
+from toilet.dataloader import FakeDataloader, NoJSONDataloader, StringDataloader
 
 class IndicatorTestCase(unittest.TestCase):
     def setUp(self):
@@ -70,5 +70,16 @@ class IndicatorTestCase(unittest.TestCase):
         self.assertFalse(self.toilets['men'].is_free())
         self.assertEqual(self.indicator.ind.get_icon(), 'toilets_king.png')
 
+    def test_update_toilets_error(self):
+
+        try:
+            self.indicator.dataloader = NoJSONDataloader()
+            self.indicator.update_toilets()
+
+            self.indicator.dataloader = StringDataloader()
+            self.indicator.update_toilets()
+        except Exception, err:
+          self.fail('An error occurs : %s' % str(err))
+        
 if __name__ == '__main__':
     unittest.main()

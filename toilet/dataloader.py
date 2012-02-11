@@ -29,3 +29,11 @@ class FakeDataloader():
         self.iteration += 1
 
         return datas
+
+class NoJSONDataloader:
+    def load(self):
+        return [] 
+
+class StringDataloader:
+    def load(self):
+        return "Error occured on loading API datas." 
