@@ -31,14 +31,14 @@ class ToiletTestCase(unittest.TestCase):
         self.toilet.update(False)
         self.assertFalse(self.toilet.is_free())
 
-    def test_to_string(self):
-        self.assertEqual('toilet is free', self.toilet.to_string())
+    def test_unicode(self):
+        self.assertEqual('toilet is free', unicode(self.toilet))
 
         self.toilet.update(Toilet.USED)
-        self.assertEqual('toilet is used', self.toilet.to_string())
+        self.assertEqual('toilet is used', unicode(self.toilet))
 
         self.toilet.update(False)
-        self.assertEqual('toilet is used', self.toilet.to_string())
+        self.assertEqual('toilet is used', unicode(self.toilet))
 
 if __name__ == '__main__':
     unittest.main()
