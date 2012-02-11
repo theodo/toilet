@@ -2,82 +2,132 @@
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
-from threading import Timer
+from dataloader import Dataloader
 import os
 import gtk
+import gobject
 import appindicator
 import json
 import urllib2
+import logging
 
 class ToiletIndicator:
-    def __init__(self):
+    def __init__(self, toilets, loader, tempo=3000):
+        self.women_toilet = toilets['women']
+        self.men_toilet   = toilets['men']
+        self.loader =loader
+        self.tempo = tempo
+
         self.ind = appindicator.Indicator("toilet",
-                                          self.icon_free(),
-                                          appindicator.CATEGORY_APPLICATION_STATUS)
+            self.update_icons(),
+            appindicator.CATEGORY_APPLICATION_STATUS
+        )
         self.ind.set_status(appindicator.STATUS_ACTIVE)
-        self.ind.set_attention_icon(self.icon_used())
+        self.ind.set_attention_icon(self.update_icons())
+        self.create_menu()
 
-        self.initialize_toilets()
-        self.ind.set_menu(self.create_menu())
+        self.poll()
 
-        #self.poll()
+    def poll(self):
+        """
+        Starts polling.
+        """
+        # Use 0 for tempo in tests
+        if self.tempo > 0:
+            gobject.timeout_add(self.tempo, self.update_toilets)
 
     def create_menu(self):
         """
         Create a gtk Menu with toilet menu items.
         """
-        menu = gtk.Menu()
-        menu.append(self.wemen_toilet.menu_item)
-        self.wemen_toilet.menu_item.show()
+        self.menu = gtk.Menu()
 
-        menu.append(self.men_toilet.menu_item)
-        self.men_toilet.menu_item.show()
+        self.women_menu_item = gtk.MenuItem(unicode(self.women_toilet))
+        self.menu.append(self.women_menu_item)
+        self.women_menu_item.show()
 
-        return menu
+        self.men_menu_item = gtk.MenuItem(unicode(self.men_toilet))
+        self.menu.append(self.men_menu_item)
+        self.men_menu_item.show()
+
+        self.ind.set_menu(self.menu)
+
+    def update_labels(self):
+        """
+        Updates the labels of the menu items.
+        """
+        self.women_menu_item.get_child().set_label(unicode(self.women_toilet))
+        self.men_menu_item.get_child().set_label(unicode(self.men_toilet))
+
+    def update_icons(self):
+        """
+        Update icon with toilets status.
+        """
+        if self.women_toilet.is_free() is True:
+            if self.men_toilet.is_free() is True:
+                return self.icon_free()
+            else:
+                return self.icon_men()
+        else:
+            if self.men_toilet.is_free() is True:
+                return self.icon_women()
+            else:
+                return self.icon_used()
 
     def icon_directory(self):
-        return os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "./images" + os.path.sep
+        """
+        Returns the icons directory.
+        """
+        return os.path.dirname(os.path.realpath(__file__)) + os.path.sep + "images" + os.path.sep
 
     def icon_free(self):
-        return self.icon_directory() + "toilet-free.png"
+        """
+        Returns the toilets free icon image.
+        """
+        return self.icon_directory() + "toilets.png"
 
     def icon_used(self):
-        return self.icon_directory() + "toilet-used.png"
+        """
+        Returns the toilets used icon image.
+        """
+        return self.icon_directory() + "toilets_used.png"
 
-    def initialize_toilets(self):
-        self.wemen_toilet = Toilet('Wemen', 'captor1')
-        self.wemen_toilet.menu_item = gtk.MenuItem(self.wemen_toilet.to_string())
+    def icon_men(self):
+        """
+        Returns the men toilets used icon image.
+        """
+        return self.icon_directory() + "toilets_king.png"
 
-        self.men_toilet   = Toilet('Mens', 'captor2')
-        self.men_toilet.menu_item = gtk.MenuItem(self.men_toilet.to_string())
-
-        self.update_toilets()
-
-    def poll(self):
-        print 'Toilets statuses will be updated in 1 seconds'
-        Timer(3.0, self.update_toilets).start()
+    def icon_women(self):
+        """
+        Returns the women toilets used icon image.
+        """
+        return self.icon_directory() + "toilets_queen.png"
 
     def update_toilets(self):
-        print 'Updating toilets statuses from http://lights.theodo.fr'
-        #datas = json.load(urllib2.urlopen('http://lights.theodo.fr'))
+        """
+        Update toilets' status.
+        """
+        try:
+            datas = self.loader.load()
 
-        #self.wemen_toilet.update(datas[self.wemen_toilet.captor()])
-        #self.men_toilet.update(datas[self.men_toilet.captor()])
+            self.women_toilet.update(datas[self.women_toilet.captor()])
+            self.men_toilet.update(datas[self.men_toilet.captor()])
 
-        self.wemen_toilet.update(False if self.wemen_toilet.is_free() else True)
-        self.men_toilet.update(False if self.men_toilet.is_free() else True)
+  
+            self.ind.set_icon(self.update_icons())
 
-        for toilet in [self.wemen_toilet, self.men_toilet]:
-            if toilet.is_free() is False:
-                self.ind.set_status(appindicator.STATUS_ATTENTION)
-            else:
-                self.ind.set_status(appindicator.STATUS_ACTIVE)
-            print toilet.to_string()
+            self.update_labels()
 
-        #self.poll()
-        Timer(3.0, self.update_toilets).start()
-
+        except Exception as err:
+            logging.error(str(err))  
+        finally:
+            self.poll()
 
 if __name__ == "__main__":
-    indicator = ToiletIndicator()
+    toilets = {
+        'women': Toilet('Women', 'captor2', True),
+        'men':   Toilet('Men', 'captor1', True)
+    }
+    indicator = ToiletIndicator(toilets, Dataloader())
     gtk.main()
