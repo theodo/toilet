@@ -8,6 +8,7 @@ import gobject
 import appindicator
 import json
 import urllib2
+import logging
 
 class ToiletIndicator:
     def __init__(self, toilets, tempo=3000):
@@ -119,9 +120,8 @@ class ToiletIndicator:
 
             self.update_labels()
 
-        except TypeError as e:
-            print 'There was an error : %s' % datas
-            print e
+        except Exception as err:
+            logging.error(str(err))  
         finally:
             self._poll()
 
