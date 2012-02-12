@@ -50,6 +50,15 @@ class ToiletIndicator:
         self.menu.append(self.men_menu_item)
         self.men_menu_item.show()
 
+        separator = gtk.SeparatorMenuItem()
+        separator.show()
+        self.menu.append(separator)
+
+        item = gtk.MenuItem('Quit')
+        item.connect("activate", gtk.main_quit, None)
+        item.show()
+        self.menu.append(item)
+
         self.ind.set_menu(self.menu)
 
     def update_labels(self):
