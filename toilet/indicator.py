@@ -2,7 +2,7 @@
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
-from dataloader import FakeDataloader
+from dataloader import Dataloader
 import os
 import gtk
 import gobject
@@ -82,6 +82,7 @@ class ToiletIndicator:
         """
         Update icon with toilets status.
         """
+        self.logger.info('Updating icons.')
         if self.women_toilet.is_free() is True:
             if self.men_toilet.is_free() is True:
                 return self.icon_free()
@@ -139,6 +140,7 @@ class ToiletIndicator:
             self.logger.debug(unicode(self.women_toilet))
             self.logger.debug(unicode(self.men_toilet))
 
+            self.logger.debug('Icon is %s' % self.update_icons())
             self.ind.set_icon(self.update_icons())
 
             self.update_labels()

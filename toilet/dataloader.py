@@ -37,3 +37,12 @@ class NoJSONDataloader:
 class StringDataloader:
     def load(self):
         return "Error occured on loading API datas." 
+
+import random
+
+class RandomDataloader:
+    def load(self):
+        return {
+            'captor1': random.choice([True, False]),
+            'captor2': random.choice([True, False]),
+            }
