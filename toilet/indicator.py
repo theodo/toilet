@@ -2,7 +2,7 @@
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
-from dataloader import Dataloader
+from dataloader import RandomDataloader
 import os
 import gtk
 import gobject
@@ -75,8 +75,8 @@ class ToiletIndicator:
         Updates the labels of the menu items.
         """
         self.logger.info('Updating labels.')
-        self.women_menu_item.get_child().set_label(unicode(self.women_toilet))
-        self.men_menu_item.get_child().set_label(unicode(self.men_toilet))
+        self.women_menu_item.set_label(unicode(self.women_toilet))
+        self.men_menu_item.set_label(unicode(self.men_toilet))
 
     def update_icons(self):
         """
@@ -155,5 +155,5 @@ if __name__ == "__main__":
         'women': Toilet('Women', 'captor2', True),
         'men':   Toilet('Men', 'captor1', True)
     }
-    indicator = ToiletIndicator(toilets, Dataloader())
+    indicator = ToiletIndicator(toilets, RandomDataloader())
     gtk.main()
