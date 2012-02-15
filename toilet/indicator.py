@@ -77,8 +77,6 @@ class ToiletIndicator:
         self.logger.info('Updating labels.')
         self.women_menu_item.set_label(unicode(self.women_toilet))
         self.men_menu_item.set_label(unicode(self.men_toilet))
-        #self.women_menu_item.get_child().set_label(unicode(self.women_toilet))
-        #self.men_menu_item.get_child().set_label(unicode(self.men_toilet))
 
     def update_icons(self):
         """
