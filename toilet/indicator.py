@@ -2,7 +2,7 @@
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
-from dataloader import RandomDataloader
+from dataloader import Dataloader
 import os
 import gtk
 import gobject
@@ -155,5 +155,5 @@ if __name__ == "__main__":
         'women': Toilet('Women', 'captor2', True),
         'men':   Toilet('Men', 'captor1', True)
     }
-    indicator = ToiletIndicator(toilets, RandomDataloader())
+    indicator = ToiletIndicator(toilets, Dataloader())
     gtk.main()
