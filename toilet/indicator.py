@@ -2,17 +2,23 @@
 __author__ = 'Benjamin Grandfond <benjaming@theodo.fr>'
 
 from toilet import Toilet
-from dataloader import Dataloader
+from dataloader import FakeDataloader
 import os
 import gtk
 import gobject
 import appindicator
-import json
-import urllib2
 import logging
 
 class ToiletIndicator:
     def __init__(self, toilets, loader, tempo=3000):
+        
+        formatter = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
+        handler = logging.FileHandler('toilet.log')
+        handler.setFormatter(formatter)
+        self.logger = logging.getLogger()
+        self.logger.addHandler(handler)
+        self.logger.setLevel(logging.DEBUG)
+
         self.women_toilet = toilets['women']
         self.men_toilet   = toilets['men']
         self.loader =loader
@@ -25,6 +31,8 @@ class ToiletIndicator:
         self.ind.set_status(appindicator.STATUS_ACTIVE)
         self.ind.set_attention_icon(self.update_icons())
         self.create_menu()
+
+        self.logger.info('ToiletApplication initialized.')
 
         self.poll()
 
@@ -40,6 +48,7 @@ class ToiletIndicator:
         """
         Create a gtk Menu with toilet menu items.
         """
+        self.logger.info('Create menu.')
         self.menu = gtk.Menu()
 
         self.women_menu_item = gtk.MenuItem(unicode(self.women_toilet))
@@ -65,6 +74,7 @@ class ToiletIndicator:
         """
         Updates the labels of the menu items.
         """
+        self.logger.info('Updating labels.')
         self.women_menu_item.get_child().set_label(unicode(self.women_toilet))
         self.men_menu_item.get_child().set_label(unicode(self.men_toilet))
 
@@ -117,19 +127,24 @@ class ToiletIndicator:
         """
         Update toilets' status.
         """
+        self.logger.info('Update toilets.')
         try:
             datas = self.loader.load()
+
+            self.logger.debug(datas)
 
             self.women_toilet.update(datas[self.women_toilet.captor()])
             self.men_toilet.update(datas[self.men_toilet.captor()])
 
-  
+            self.logger.debug(unicode(self.women_toilet))
+            self.logger.debug(unicode(self.men_toilet))
+
             self.ind.set_icon(self.update_icons())
 
             self.update_labels()
 
         except Exception as err:
-            logging.error(str(err))  
+            self.logger.error(str(err))  
         finally:
             self.poll()
 
