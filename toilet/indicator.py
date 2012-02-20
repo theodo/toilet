@@ -11,9 +11,13 @@ import logging
 
 class ToiletIndicator:
     def __init__(self, toilets, loader, tempo=3000):
-        
         formatter = logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s')
-        handler = logging.FileHandler('toilet.log')
+        logdir = os.path.realpath(os.path.dirname(__file__)) + os.path.sep + 'log'
+        logfile = logdir + os.path.sep + 'toilet.log'
+        if not os.path.exists(logdir):
+          os.mkdir(logdir)
+
+        handler = logging.FileHandler(logfile)
         handler.setFormatter(formatter)
         self.logger = logging.getLogger()
         self.logger.addHandler(handler)
